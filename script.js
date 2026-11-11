@@ -1,3 +1,4 @@
+
 const foodForm = document.getElementById("foodForm");
 const foodName = document.getElementById("foodName");
 const calories = document.getElementById("calories");
@@ -5,36 +6,74 @@ const foodList = document.getElementById("foodList");
 const totalCalories = document.getElementById("totalCalories");
 const resetBtn = document.getElementById("resetBtn");
 
-console.log(foodName);
 const foods = [];
 
+// Add food
 foodForm.addEventListener("submit", (event) => {
-if(!foodName){
-    displayMessage("Please enter a food input");
-    return;
-}else if(!calories || calories < 0 || calories  > 1000){
-    displayMessage("Please enter a valid calorie input")
-    return;
+
+    event.preventDefault();
+
+    // Get actual input values
+    const name = foodName.value.trim();
+    const calorieValue = Number(calories.value);
+
+    // Validate food name
+    if (!name) {
+        displayMessage("Please enter a food name");
+        return;
+    }
+
+    // Validate calories
+    if (
+        calories.value === "" ||
+        !Number.isFinite(calorieValue) ||
+        calorieValue < 0 ||
+        calorieValue > 1000
+    ) {
+        displayMessage("Please enter a valid calorie amount (0-1000)");
+        return;
+    }
+
+    // Store food information
+    foods.push({
+        name: name,
+        calories: calorieValue
+    });
+
+    // Create food list item
+    const foodItem = document.createElement("li");
+
+    foodItem.className =
+        "flex justify-between rounded bg-gray-100 px-4 py-2";
+
+    foodItem.textContent = `${name}: ${calorieValue} calories`;
+
+    foodList.appendChild(foodItem);
+
+    // Calculate total calories
+    const total = foods.reduce(
+        (sum, food) => sum + food.calories,
+        0
+    );
+
+    totalCalories.textContent = total;
+
+    // Clear input fields
+    foodForm.reset();
+});
+
+// Display messages
+function displayMessage(message) {
+    alert(message);
 }
 
-foods.push({foodName, calories});
-const foodItem = document.createElement("li");
-  foodItem.className = "rounded bg-gray-100 px-4 py-2";
-  foodItem.textContent = ${foodName}: ${calories} calories;
-  foodList.appendChild(foodItem);
+// Reset application
+resetBtn.addEventListener("click", () => {
 
-  totalCalories.textContent = foods.reduce((total, food) => total + food.calories, 0);
-  itemCount.textContent = ${foods.length} item${foods.length === 1 ? "" : "s"};
-  emptyState.classList.add("hidden");
-  formMessage.classList.add("hidden");
-  foodForm.reset();
-})
-
-function displayMessage(message){
-    alert(message)
-}
-
-resetBtn.addEventListener("click", (event) =>{
     foods.length = 0;
 
-})
+    foodList.innerHTML = "";
+
+    totalCalories.textContent = 0;
+
+});
