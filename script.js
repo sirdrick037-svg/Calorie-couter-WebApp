@@ -25,6 +25,7 @@ function saveFoods() {
 }
 
 // Display foods
+
 function renderFoods() {
     foodList.innerHTML = "";
 
@@ -32,13 +33,14 @@ function renderFoods() {
         const foodItem = document.createElement("li");
 
         foodItem.className =
-            "flex justify-between items-center rounded bg-gray-100 px-4 py-2";
+            "flex justify-between items-center bg-gray-100 rounded px-4 py-3";
 
+        // Food name and calories
         const foodInfo = document.createElement("span");
         foodInfo.textContent =
             `${food.name}: ${food.calories} calories`;
 
-        // Delete button
+        // Create Delete button
         const deleteBtn = document.createElement("button");
 
         deleteBtn.textContent = "Delete";
@@ -46,25 +48,30 @@ function renderFoods() {
         deleteBtn.className =
             "bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600";
 
-        deleteBtn.addEventListener("click", () => {
+        // Delete food when clicked
+        deleteBtn.addEventListener("click", function() {
             foods = foods.filter((item) => item.id !== food.id);
 
             saveFoods();
             renderFoods();
         });
 
-        foodItem.append(foodInfo, deleteBtn);
+        // Add both elements to the list
+        foodItem.appendChild(foodInfo);
+        foodItem.appendChild(deleteBtn);
+
         foodList.appendChild(foodItem);
     });
 
-    // Calculate total calories
+    // Update total calories
     const total = foods.reduce(
-        (sum, food) => sum + food.calories,
+        (sum, food) => sum + Number(food.calories),
         0
     );
 
     totalCalories.textContent = total;
 }
+
 
 // Add food
 foodForm.addEventListener("submit", (event) => {
