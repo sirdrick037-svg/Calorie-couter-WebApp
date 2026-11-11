@@ -8,24 +8,36 @@ const resetBtn = document.getElementById("resetBtn");
 
 const STORAGE_KEY = "calorieCounterFoods";
 
-let foods = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+// Load saved foods safely
+function loadFoods() {
+    try {
+        const savedFoods = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(savedFoods) ? savedFoods : [];
+    } catch (error) {
+        console.error("Could not load saved foods:", error);
+        return [];
+    }
+}
 
-// Save food entries
+let foods = loadFoods();
+
+// Save foods
 function saveFoods() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(foods));
 }
 
-// Display food entries
+// Display foods and update total
 function renderFoods() {
     foodList.innerHTML = "";
 
     foods.forEach((food) => {
-        const foodItem = document.createElement("li");
-        foodItem.className =
-            "flex justify-between items-center rounded bg-gray-100 px-4 py-3";
+        const item = document.createElement("li");
 
-        const foodInfo = document.createElement("span");
-        foodInfo.textContent = `${food.name}: ${food.calories} calories`;
+        item.className =
+            "flex justify-between items-center bg-gray-100 p-3 rounded";
+
+        const details = document.createElement("span");
+        details.textContent = `${food.name} - ${food.calories} calories`;
 
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "Delete";
@@ -34,18 +46,18 @@ function renderFoods() {
             "bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600";
 
         deleteBtn.addEventListener("click", () => {
-            foods = foods.filter((item) => item.id !== food.id);
+            foods = foods.filter((f) => f.id !== food.id);
             saveFoods();
             renderFoods();
         });
 
-        foodItem.append(foodInfo, deleteBtn);
-        foodList.appendChild(foodItem);
+        item.append(details, deleteBtn);
+        foodList.appendChild(item);
     });
 
-    // Calculate total calories
+    // Calculate total
     const total = foods.reduce(
-        (sum, food) => sum + food.calories,
+        (sum, food) => sum + Number(food.calories || 0),
         0
     );
 
@@ -74,7 +86,7 @@ foodForm.addEventListener("submit", (event) => {
     }
 
     const newFood = {
-        id: Date.now(),
+        id: crypto.randomUUID(),
         name: name,
         calories: calorieValue
     };
@@ -87,20 +99,19 @@ foodForm.addEventListener("submit", (event) => {
     foodForm.reset();
 });
 
-// Reset all food entries
+// Reset all foods
 resetBtn.addEventListener("click", () => {
-    if (foods.length === 0) return;
+    if (foods.length === 0) {
+        alert("There are no food entries to reset.");
+        return;
+    }
 
-    const confirmReset = confirm(
-        "Are you sure you want to delete all food entries?"
-    );
-
-    if (confirmReset) {
+    if (confirm("Are you sure you want to clear all food entries?")) {
         foods = [];
         saveFoods();
         renderFoods();
     }
 });
 
-// Load saved entries when page opens
+// Display saved foods when page loads
 renderFoods();
