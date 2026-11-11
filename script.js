@@ -1,4 +1,4 @@
-
+console.log("Calorie Counter JavaScript is working!");
 const foodForm = document.getElementById("foodForm");
 const foodName = document.getElementById("foodName");
 const calories = document.getElementById("calories");
